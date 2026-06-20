@@ -5,7 +5,6 @@ import shutil
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-
 DEFAULT_OUTPUT_DIR = Path("~/Downloads/SosyalHaliSaha").expanduser()
 VIDEO_EXTENSIONS = (".mp4", ".m3u8")
 
@@ -55,6 +54,7 @@ def sanitize_filename(value: str, default: str = "sosyal-halisaha-video") -> str
     value = re.sub(r"\s*-\s*", "-", value)
     value = re.sub(r"\s+", " ", value)
     value = re.sub(r"[\x00-\x1f\x7f]+", "", value)
+    value = re.sub(r"\s+(\.[^.]+)$", r"\1", value)
     value = value.strip(" .-_")
     return value or default
 

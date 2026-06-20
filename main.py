@@ -30,7 +30,6 @@ from utils import (
     video_type_from_url,
 )
 
-
 LOGGER = logging.getLogger("sosyal_halisaha_downloader")
 
 

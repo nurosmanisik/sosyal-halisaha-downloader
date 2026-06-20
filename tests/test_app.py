@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import app as webapp
 from downloader import ToolStatus
-from finder import FinderDefaults, FinderOption, MatchSearchResult, MatchResult
 from extractor import VideoCandidate
+from finder import FinderDefaults, FinderOption, MatchResult, MatchSearchResult
 from jobs import DownloadJob
 from preflight import PreflightInfo
 from utils import UserFacingError
@@ -93,6 +93,12 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(cities.get_json()[0]["id"], 34)
         self.assertEqual(districts.get_json()[0]["id"], 437)
         self.assertEqual(places.get_json()[0]["name"], "Ufuk Halı Saha")
+
+    def test_finder_option_endpoint_rejects_invalid_id(self) -> None:
+        response = self.client.get("/api/finder/districts?city_id=abc")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("gecerli il", response.get_json()["error"])
 
     def test_finder_fields_endpoint(self) -> None:
         with patch.object(
@@ -182,6 +188,16 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["selected_url"], "https://cdn.example.com/video.mp4")
         self.assertEqual(data["candidates"][0]["type"], "mp4")
+
+    def test_finder_extract_endpoint_rejects_empty_candidates(self) -> None:
+        with patch.object(webapp.finder, "extract_videos", return_value=[]):
+            response = self.client.post(
+                "/api/finder/extract",
+                json={"match_url": "https://sosyalhalisaha.com/mac-detay/174415967"},
+            )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("video linki bulunamadi", response.get_json()["error"])
 
     def test_dry_run_rejects_invalid_url(self) -> None:
         response = self.client.post("/api/dry-run", json={"url": "file:///tmp/a.mp4"})
@@ -293,7 +309,9 @@ class AppTestCase(unittest.TestCase):
                 status="completed",
                 output_path=target,
             )
-            with patch.object(webapp.job_manager, "get", return_value=job), patch.object(
+            with patch.object(webapp.platform, "system", return_value="Darwin"), patch.object(
+                webapp.job_manager, "get", return_value=job
+            ), patch.object(
                 webapp.subprocess,
                 "run",
             ) as run:
@@ -302,6 +320,52 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["status"], "ok")
         self.assertEqual(run.call_args.args[0], ["open", "-R", str(target)])
+
+    def test_reveal_endpoint_rejects_missing_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            job = DownloadJob(
+                id="job-1",
+                url="https://cdn.example.com/video.mp4",
+                output_dir=Path(tmp_dir),
+                use_ytdlp=False,
+                use_aria2=False,
+                connections=4,
+                output_name=None,
+                overwrite=False,
+                preflight_info=None,
+                status="completed",
+                output_path=Path(tmp_dir) / "missing.mp4",
+            )
+            with patch.object(webapp.job_manager, "get", return_value=job):
+                response = self.client.post("/api/jobs/job-1/reveal")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("Dosya henuz", response.get_json()["error"])
+
+    def test_reveal_endpoint_rejects_non_macos(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            target = Path(tmp_dir) / "video.mp4"
+            target.write_bytes(b"123")
+            job = DownloadJob(
+                id="job-1",
+                url="https://cdn.example.com/video.mp4",
+                output_dir=Path(tmp_dir),
+                use_ytdlp=False,
+                use_aria2=False,
+                connections=4,
+                output_name=None,
+                overwrite=False,
+                preflight_info=None,
+                status="completed",
+                output_path=target,
+            )
+            with patch.object(webapp.platform, "system", return_value="Linux"), patch.object(
+                webapp.job_manager, "get", return_value=job
+            ):
+                response = self.client.post("/api/jobs/job-1/reveal")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("sadece macOS", response.get_json()["error"])
 
     def test_download_user_error(self) -> None:
         with patch.object(webapp, "fetch_preflight", side_effect=UserFacingError("bad")):

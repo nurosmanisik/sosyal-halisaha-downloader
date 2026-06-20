@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from email.message import Message
 from email.parser import Parser
 from pathlib import Path
-import re
 from urllib.parse import unquote
 
 from utils import UserFacingError, sanitize_filename, validate_url

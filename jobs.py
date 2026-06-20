@@ -5,9 +5,9 @@ import subprocess
 import threading
 import time
 import uuid
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
 
 from downloader import (
     _build_aria2_command,
@@ -21,7 +21,6 @@ from downloader import (
 from history import record_download
 from preflight import PreflightInfo, format_bytes
 from utils import UserFacingError, ensure_output_dir, video_type_from_url
-
 
 ARIA2_PROGRESS_RE = re.compile(
     r"(?P<done>[\d.]+[KMGT]?i?B)"

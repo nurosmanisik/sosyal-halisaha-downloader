@@ -4,6 +4,7 @@ import html
 import re
 import time
 import unicodedata
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
@@ -11,7 +12,6 @@ from urllib.parse import urljoin
 
 from extractor import VideoCandidate, get_video_candidates
 from utils import UserFacingError, validate_url
-
 
 BASE_URL = "https://sosyalhalisaha.com"
 DEFAULT_CITY = "İstanbul"
@@ -191,7 +191,7 @@ class SosyalHaliSahaFinder:
     def _cached_options(
         self,
         key: str,
-        loader,
+        loader: Callable[[], list[FinderOption]],
     ) -> list[FinderOption]:
         cached = self._option_cache.get(key)
         now = time.monotonic()

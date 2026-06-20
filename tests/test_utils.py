@@ -27,6 +27,12 @@ class UtilsTestCase(unittest.TestCase):
     def test_sanitize_filename_removes_unsafe_characters(self) -> None:
         self.assertEqual(sanitize_filename(' mac:/detay*?"<>| .mp4 '), "mac-detay-.mp4")
 
+    def test_sanitize_filename_uses_default_for_empty_name(self) -> None:
+        self.assertEqual(sanitize_filename('   .-_ "  '), "sosyal-halisaha-video")
+
+    def test_sanitize_filename_removes_control_characters(self) -> None:
+        self.assertEqual(sanitize_filename("mac\x00final\x1f.mp4"), "macfinal.mp4")
+
     def test_filename_from_url_decodes_and_sanitizes(self) -> None:
         url = "https://cdn.example.com/a%20b/video:1.mp4?token=abc"
         self.assertEqual(filename_from_url(url), "video-1.mp4")

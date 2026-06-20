@@ -18,6 +18,7 @@ to maintain.
 python3 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements-dev.txt
 brew install yt-dlp aria2 ffmpeg
 ```
 
@@ -29,6 +30,7 @@ Run before opening a pull request:
 .venv/bin/python -m unittest discover -s tests
 .venv/bin/python -m py_compile app.py downloader.py extractor.py finder.py jobs.py utils.py
 node --check static/app.js
+.venv/bin/python -m ruff check .
 ```
 
 Do not include downloaded videos, partial downloads, logs, `.venv`, `.idea`, or

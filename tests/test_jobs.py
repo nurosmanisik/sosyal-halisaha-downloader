@@ -2,7 +2,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from jobs import DownloadJob, DownloadJobManager, parse_aria2_progress, parse_eta, parse_size, parse_ytdlp_progress
+from jobs import (
+    DownloadJob,
+    DownloadJobManager,
+    parse_aria2_progress,
+    parse_eta,
+    parse_size,
+    parse_ytdlp_progress,
+)
 
 
 class JobsTestCase(unittest.TestCase):
@@ -68,6 +75,31 @@ class JobsTestCase(unittest.TestCase):
         self.assertEqual(payload["eta_seconds"], 5)
         self.assertEqual(payload["eta_source"], "calculated")
         self.assertEqual(payload["progress_quality"], "estimated")
+
+    def test_payload_for_paused_job_keeps_resume_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            target = Path(tmp_dir) / "video.mp4"
+            target.write_bytes(b"12345")
+            job = DownloadJob(
+                id="job-1",
+                url="https://cdn.example.com/video.mp4",
+                output_dir=Path(tmp_dir),
+                use_ytdlp=False,
+                use_aria2=False,
+                connections=4,
+                output_name=None,
+                overwrite=False,
+                preflight_info=None,
+                status="paused",
+                output_path=target,
+                downloaded_bytes=5,
+                total_bytes=10,
+            )
+            payload = DownloadJobManager().payload(job)
+
+        self.assertEqual(payload["status"], "paused")
+        self.assertEqual(payload["remaining_bytes"], 5)
+        self.assertEqual(payload["file_name"], "video.mp4")
 
 
 if __name__ == "__main__":

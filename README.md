@@ -1,5 +1,7 @@
 # sosyal-halisaha-downloader
 
+[![tests](https://github.com/nurosmanisik/sosyal-halisaha-downloader/actions/workflows/tests.yml/badge.svg)](https://github.com/nurosmanisik/sosyal-halisaha-downloader/actions/workflows/tests.yml)
+
 Sosyal Hali Saha mac detay sayfalarinda tarayicida zaten erisilebilen video linklerini bulan ve indiren lokal Python aracidir. CLI ve `127.0.0.1:5000` uzerinden calisan basit web arayuzu vardir.
 
 > Bu proje public video indirme servisi degildir. Uygulama kullanicinin kendi bilgisayarinda calismak uzere tasarlanmistir.
@@ -29,7 +31,7 @@ Bu arac yalnizca erisim hakkiniz olan kendi mac kayitlarinizi indirmek icin tasa
 Projeyi klonlayin:
 
 ```bash
-git clone https://github.com/KULLANICI_ADIN/sosyal-halisaha-downloader.git
+git clone https://github.com/nurosmanisik/sosyal-halisaha-downloader.git
 cd sosyal-halisaha-downloader
 ```
 
@@ -134,8 +136,22 @@ Ek secenekler:
 
 ```bash
 .venv/bin/python -m unittest discover -s tests
-.venv/bin/python -m py_compile app.py downloader.py extractor.py finder.py jobs.py utils.py
+.venv/bin/python -m py_compile app.py downloader.py extractor.py finder.py jobs.py utils.py main.py camera.py preflight.py history.py
 node --check static/app.js
+```
+
+## Gelistirme
+
+Gelistirme araclarini kurmak icin:
+
+```bash
+.venv/bin/python -m pip install -r requirements-dev.txt
+```
+
+Kod kalitesi kontrolu:
+
+```bash
+.venv/bin/python -m ruff check .
 ```
 
 ## GitHub'a yayinlama
@@ -147,7 +163,7 @@ git init
 git branch -M main
 git add .
 git commit -m "Initial release"
-git remote add origin https://github.com/KULLANICI_ADIN/sosyal-halisaha-downloader.git
+git remote add origin https://github.com/nurosmanisik/sosyal-halisaha-downloader.git
 git push -u origin main
 ```
 

@@ -3,10 +3,12 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from preflight import (
+    _raise_for_status,
     existing_complete_file,
     filename_from_content_disposition,
     format_bytes,
 )
+from utils import UserFacingError
 
 
 class PreflightTestCase(unittest.TestCase):
@@ -33,6 +35,15 @@ class PreflightTestCase(unittest.TestCase):
             path.write_bytes(b"123")
             self.assertTrue(existing_complete_file(path, 3))
             self.assertFalse(existing_complete_file(path, 4))
+
+    def test_raise_for_status_maps_common_user_errors(self) -> None:
+        for status_code in (401, 403, 404, 500):
+            with self.subTest(status_code=status_code):
+                with self.assertRaises(UserFacingError):
+                    _raise_for_status(status_code)
+
+    def test_raise_for_status_accepts_success(self) -> None:
+        self.assertIsNone(_raise_for_status(200))
 
 if __name__ == "__main__":
     unittest.main()

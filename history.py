@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
 from utils import DEFAULT_OUTPUT_DIR
-
 
 DEFAULT_HISTORY_FILE = DEFAULT_OUTPUT_DIR / "downloads.jsonl"
 
@@ -43,7 +42,7 @@ def record_download(
         average_speed=average_speed,
         connections=connections,
         range_supported=range_supported,
-        created_at=datetime.now(timezone.utc).isoformat(),
+        created_at=datetime.now(UTC).isoformat(),
     )
     history_file = history_file.expanduser()
     history_file.parent.mkdir(parents=True, exist_ok=True)

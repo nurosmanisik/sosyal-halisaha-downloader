@@ -1,16 +1,17 @@
 from __future__ import annotations
 
+import platform
 import subprocess
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, Response, jsonify, render_template, request
 
 from camera import discover_camera_variants
 from downloader import (
     check_tools,
 )
 from extractor import VideoCandidate, get_video_candidates
-from finder import MatchSearchQuery, default_finder
+from finder import FinderOption, MatchResult, MatchSearchQuery, default_finder
 from history import read_history
 from jobs import DownloadJobManager
 from main import _resolve_connections
@@ -23,7 +24,6 @@ from utils import (
     validate_url,
     video_type_from_url,
 )
-
 
 app = Flask(__name__)
 job_manager = DownloadJobManager()
@@ -141,6 +141,8 @@ def api_finder_extract():
         url = validate_url(str(payload.get("match_url", "")))
         skip_preflight = bool(payload.get("no_preflight", False))
         candidates = finder.extract_videos(url)
+        if not candidates:
+            raise UserFacingError("Mac icin indirilebilir video linki bulunamadi.")
         selected_url = str(payload.get("selected_url") or candidates[0].url)
         preflight = None if skip_preflight else _safe_preflight(selected_url)
         connections = _resolve_connections(
@@ -170,6 +172,8 @@ def api_dry_run():
         discover_cameras = bool(payload.get("discover_cameras", False))
         skip_preflight = bool(payload.get("no_preflight", False))
         candidates = _resolve_candidates(url, discover_cameras=discover_cameras)
+        if not candidates:
+            raise UserFacingError("Indirilebilir video linki bulunamadi.")
         selected_url = str(payload.get("selected_url") or candidates[0].url)
         preflight = None if skip_preflight else _safe_preflight(selected_url)
         connections = _resolve_connections(
@@ -262,6 +266,8 @@ def api_job_reveal(job_id: str):
         job = job_manager.get(job_id)
         if job.output_path is None or not job.output_path.exists():
             raise UserFacingError("Dosya henuz bulunamiyor.")
+        if platform.system() != "Darwin":
+            raise UserFacingError("Klasorde gosterme ozelligi sadece macOS icin desteklenir.")
         subprocess.run(["open", "-R", str(job.output_path)], check=False)
         return jsonify({"status": "ok"})
     except UserFacingError as exc:
@@ -297,7 +303,7 @@ def _candidate_payload(candidate: VideoCandidate) -> dict[str, str]:
     }
 
 
-def _match_payload(match, preferred_url: str | None) -> dict[str, object]:
+def _match_payload(match: MatchResult, preferred_url: str | None) -> dict[str, object]:
     return {
         "url": match.url,
         "date": match.date,
@@ -310,7 +316,7 @@ def _match_payload(match, preferred_url: str | None) -> dict[str, object]:
     }
 
 
-def _option_payload(option) -> dict[str, object]:
+def _option_payload(option: FinderOption) -> dict[str, object]:
     return {"id": option.id, "name": option.name}
 
 
@@ -337,7 +343,7 @@ def _preflight_payload(info: PreflightInfo | None) -> dict[str, object] | None:
     }
 
 
-def _error(message: str, status_code: int):
+def _error(message: str, status_code: int) -> tuple[Response, int]:
     return jsonify({"status": "error", "error": message}), status_code
 
 

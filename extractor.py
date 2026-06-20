@@ -3,12 +3,11 @@ from __future__ import annotations
 import html
 import json
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 from urllib.parse import urljoin
 
 from utils import UserFacingError, validate_url
-
 
 VIDEO_URL_PATTERN = re.compile(
     r"""(?P<url>(?:https?:)?//[^'"\s<>]+?\.(?:mp4|m3u8)(?:\?[^'"\s<>]*)?|/[^'"\s<>]+?\.(?:mp4|m3u8)(?:\?[^'"\s<>]*)?)""",
@@ -80,12 +79,11 @@ def _candidate_strings(html_text: str) -> Iterable[str]:
     for match in VIDEO_URL_PATTERN.finditer(decoded_js_urls):
         yield match.group("url")
 
-    for quoted in re.findall(
+    yield from re.findall(
         r"""["']([^"']+\.(?:mp4|m3u8)(?:\?[^"']*)?)["']""",
         decoded_js_urls,
         re.I,
-    ):
-        yield quoted
+    )
 
     for script_json in _json_like_blocks(decoded):
         for value in _walk_json_values(script_json):
