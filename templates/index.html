@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sosyal Hali Saha Downloader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="workspace">
+        <div class="brandline">
+          <div>
+            <h1>Sosyal Hali Saha Downloader</h1>
+            <p>Mac videolarini analiz et, kamera acisini sec, kaynagi bozmadan indir.</p>
+          </div>
+          <div class="status-pill" id="serverStatus">Hazir</div>
+        </div>
+
+        <div class="grid">
+          <section class="panel main-panel">
+            <form id="downloadForm">
+              <div class="mode-switch" role="tablist" aria-label="Kullanim modu">
+                <button type="button" class="mode-btn active" id="linkModeBtn">Link ile indir</button>
+                <button type="button" class="mode-btn" id="finderModeBtn">Maci otomatik bul</button>
+              </div>
+
+              <div class="section-title">
+                <h2>Temel</h2>
+                <p>Linki yapistir, gerekirse kamera acilarini ara, sonra indir.</p>
+              </div>
+
+              <div id="linkModePanel">
+                <label class="field">
+                <span>Video veya mac detay linki</span>
+                  <input id="urlInput" name="url" type="url" placeholder="https://sosyalhalisaha.com/mac-detay/..." />
+                </label>
+              </div>
+
+              <div id="finderModePanel" class="finder-panel hidden">
+                <div class="finder-flow" aria-label="Otomatik bulma adimlari">
+                  <span>Konum</span>
+                  <span>Mac</span>
+                  <span>Video</span>
+                </div>
+                <div class="finder-grid">
+                  <label class="field">
+                    <span>Tarih</span>
+                    <input id="finderDateInput" type="date" />
+                  </label>
+
+                  <label class="field">
+                    <span>Saat</span>
+                    <select id="finderTimeInput">
+                      <option value="00:00">00:00</option>
+                      <option value="01:00">01:00</option>
+                      <option value="02:00">02:00</option>
+                      <option value="03:00">03:00</option>
+                      <option value="04:00">04:00</option>
+                      <option value="05:00">05:00</option>
+                      <option value="06:00">06:00</option>
+                      <option value="07:00">07:00</option>
+                      <option value="08:00">08:00</option>
+                      <option value="09:00">09:00</option>
+                      <option value="10:00">10:00</option>
+                      <option value="11:00">11:00</option>
+                      <option value="12:00">12:00</option>
+                      <option value="13:00">13:00</option>
+                      <option value="14:00">14:00</option>
+                      <option value="15:00">15:00</option>
+                      <option value="16:00">16:00</option>
+                      <option value="17:00">17:00</option>
+                      <option value="18:00">18:00</option>
+                      <option value="19:00">19:00</option>
+                      <option value="20:00">20:00</option>
+                      <option value="21:00">21:00</option>
+                      <option value="22:00">22:00</option>
+                      <option value="23:00">23:00</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>Il</span>
+                    <select id="finderCityInput"></select>
+                  </label>
+
+                  <label class="field">
+                    <span>Ilce</span>
+                    <select id="finderDistrictInput"></select>
+                  </label>
+
+                  <label class="field">
+                    <span>Tesis</span>
+                    <select id="finderPlaceInput"></select>
+                  </label>
+
+                  <label class="field">
+                    <span>Saha</span>
+                    <select id="finderFieldInput">
+                      <option value="Üst Saha">Üst Saha</option>
+                    </select>
+                  </label>
+                </div>
+                <button type="button" class="btn secondary finder-submit" id="finderSearchBtn">Maci Bul</button>
+              </div>
+
+              <label class="field">
+                <span>Indirme klasoru</span>
+                <input id="outputInput" name="output" type="text" value="{{ default_output }}" />
+              </label>
+
+              <label class="option-row primary-option">
+                <span class="option-copy">
+                  <strong>Kamera acilarini ara</strong>
+                  <small>Ayni macin diger kamera kayitlarini bulmayi dener.</small>
+                </span>
+                <span class="toggle">
+                  <input id="discoverInput" type="checkbox" />
+                  <span></span>
+                </span>
+              </label>
+
+              <details class="advanced">
+                <summary>
+                  <span>Gelismis ayarlar</span>
+                  <small>Normalde degistirmen gerekmez.</small>
+                </summary>
+
+                <div class="advanced-grid">
+                  <label class="field">
+                    <span>Cikti dosya adi</span>
+                    <input id="outputNameInput" name="output_name" type="text" placeholder="Opsiyonel" />
+                  </label>
+
+                  <label class="field">
+                    <span>Baglanti sayisi</span>
+                    <select id="connectionsInput" name="connections">
+                      <option value="auto">Auto - onerilen</option>
+                      <option value="1">1 - en uyumlu</option>
+                      <option value="4">4 - dengeli</option>
+                      <option value="8">8 - hizli</option>
+                      <option value="16">16 - maksimum deneme</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="option-list">
+                  <label class="option-row">
+                    <span class="option-copy">
+                      <strong>Uzerine yaz</strong>
+                      <small>Ayni dosya varsa yeniden indirir. Sadece tekrar indirmek istediginde ac.</small>
+                    </span>
+                    <span class="toggle">
+                      <input id="overwriteInput" type="checkbox" />
+                      <span></span>
+                    </span>
+                  </label>
+
+                  <label class="option-row">
+                    <span class="option-copy">
+                      <strong>Link kontrolunu atla</strong>
+                      <small>Preflight sorun cikartirsa kullan. Normalde kapali kalmali.</small>
+                    </span>
+                    <span class="toggle">
+                      <input id="preflightInput" type="checkbox" />
+                      <span></span>
+                    </span>
+                  </label>
+
+                  <label class="option-row">
+                    <span class="option-copy">
+                      <strong>yt-dlp kullan</strong>
+                      <small>Playlist veya m3u8 videolarda daha uygundur. Emin degilsen kapali kalsin.</small>
+                    </span>
+                    <span class="toggle">
+                      <input id="useYtdlpInput" type="checkbox" />
+                      <span></span>
+                    </span>
+                  </label>
+
+                  <label class="option-row">
+                    <span class="option-copy">
+                      <strong>aria2c kullan</strong>
+                      <small>Direkt mp4 dosyalarinda hizli indirme dener. Emin degilsen otomatik secime birak.</small>
+                    </span>
+                    <span class="toggle">
+                      <input id="useAriaInput" type="checkbox" />
+                      <span></span>
+                    </span>
+                  </label>
+                </div>
+              </details>
+
+              <div class="actions">
+                <button type="button" class="btn secondary" id="analyzeBtn">Analiz Et</button>
+                <button type="submit" class="btn primary" id="downloadBtn">Secili Videoyu Indir</button>
+              </div>
+            </form>
+          </section>
+
+          <aside class="side">
+            <section class="panel mini">
+              <div class="panel-head">
+                <h2>Araclar</h2>
+                <button class="icon-btn" id="refreshToolsBtn" title="Yenile">↻</button>
+              </div>
+              <div id="toolsList" class="tool-list"></div>
+            </section>
+
+            <section class="panel mini">
+              <div class="panel-head">
+                <h2>Gecmis</h2>
+                <button class="icon-btn" id="refreshHistoryBtn" title="Yenile">↻</button>
+              </div>
+              <div id="historyList" class="history-list"></div>
+            </section>
+          </aside>
+        </div>
+
+        <section class="panel results">
+          <div class="panel-head">
+            <h2>Analiz ve Sonuc</h2>
+            <span id="resultMeta"></span>
+          </div>
+          <div id="messageBox" class="message hidden"></div>
+          <div id="progressPanel" class="progress-panel hidden">
+            <div class="progress-top">
+              <div>
+                <strong id="progressTitle">Indirme hazirlaniyor</strong>
+                <span id="progressSub">Durum bekleniyor</span>
+              </div>
+              <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-track" aria-label="Indirme ilerlemesi">
+              <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div class="progress-file">
+              <span>Dosya</span>
+              <strong id="progressFile">bekleniyor</strong>
+            </div>
+            <div class="progress-stats">
+              <div>
+                <span>Indirilen</span>
+                <strong id="progressBytes">bilinmiyor</strong>
+              </div>
+              <div>
+                <span>Kalan Boyut</span>
+                <strong id="progressRemaining">hesaplaniyor</strong>
+              </div>
+              <div>
+                <span>Hiz</span>
+                <strong id="progressSpeed">bilinmiyor</strong>
+              </div>
+              <div>
+                <span>Kalan</span>
+                <strong id="progressEta">bilinmiyor</strong>
+              </div>
+              <div>
+                <span>Arac</span>
+                <strong id="progressTool">bekleniyor</strong>
+              </div>
+            </div>
+            <div class="progress-actions">
+              <button type="button" class="btn secondary" id="pauseBtn">Duraklat</button>
+              <button type="button" class="btn secondary" id="resumeBtn" disabled>Devam Et</button>
+              <button type="button" class="btn danger" id="cancelBtn">Iptal Et</button>
+              <button type="button" class="btn secondary" id="revealBtn" disabled>Klasorde Goster</button>
+              <button type="button" class="btn secondary" id="copyPathBtn" disabled>Yolu Kopyala</button>
+              <button type="button" class="btn secondary" id="newLinkBtn">Yeni Link</button>
+            </div>
+          </div>
+          <div id="matchList" class="match-list"></div>
+          <div id="candidateList" class="candidate-list"></div>
+          <div id="resultBox" class="result-box"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
