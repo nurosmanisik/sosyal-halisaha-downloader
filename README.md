@@ -49,6 +49,40 @@ macOS icin indirme araclarini Homebrew ile kurun:
 brew install yt-dlp aria2 ffmpeg
 ```
 
+## Mac uygulamasi gibi kullanma
+
+Launcher uygulamasini olusturun:
+
+```bash
+scripts/make_macos_app.sh
+```
+
+Olusan uygulama:
+
+```text
+Sosyal Hali Saha Downloader.app
+```
+
+Uygulamaya cift tiklayinca:
+
+- Lokal server gerekiyorsa baslatilir.
+- Server zaten calisiyorsa tekrar baslatilmaz.
+- Tarayici otomatik olarak `http://127.0.0.1:5000` adresini acar.
+
+Server'i durdurmak icin:
+
+```bash
+scripts/stop_web.sh
+```
+
+Launcher loglari:
+
+```text
+.launcher/web.log
+```
+
+Not: Bu `.app` sadece lokal launcher'dir. Projeyi public server olarak yayinlamaz.
+
 ## Web arayuzu
 
 Lokal arayuzu baslatin:

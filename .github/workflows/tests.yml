@@ -37,5 +37,11 @@ jobs:
       - name: Check frontend JavaScript
         run: node --check static/app.js
 
+      - name: Check launcher scripts
+        run: |
+          bash -n scripts/run_web.sh
+          bash -n scripts/stop_web.sh
+          bash -n scripts/make_macos_app.sh
+
       - name: Run ruff
         run: python -m ruff check .

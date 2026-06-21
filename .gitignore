@@ -19,4 +19,8 @@ history.jsonl
 *.sqlite
 dist/
 build/
+*.app/
+.launcher/
+logs/
+*.pid
 .DS_Store
