@@ -32,7 +32,7 @@ jobs:
         run: python -m unittest discover -s tests
 
       - name: Compile Python files
-        run: python -m py_compile app.py downloader.py extractor.py finder.py jobs.py utils.py
+        run: python -m py_compile app.py downloader.py extractor.py finder.py jobs.py utils.py desktop_app.py
 
       - name: Check frontend JavaScript
         run: node --check static/app.js
@@ -42,6 +42,7 @@ jobs:
           bash -n scripts/run_web.sh
           bash -n scripts/stop_web.sh
           bash -n scripts/make_macos_app.sh
+          bash -n packaging/macos/build_app.sh
 
       - name: Run ruff
         run: python -m ruff check .

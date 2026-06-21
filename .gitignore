@@ -19,6 +19,7 @@ history.jsonl
 *.sqlite
 dist/
 build/
+.pyinstaller/
 *.app/
 .launcher/
 logs/

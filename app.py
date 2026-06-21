@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import platform
 import subprocess
+import sys
 from pathlib import Path
 
 from flask import Flask, Response, jsonify, render_template, request
@@ -25,7 +26,17 @@ from utils import (
     video_type_from_url,
 )
 
-app = Flask(__name__)
+
+def resource_path(relative_path: str) -> Path:
+    base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+    return base_path / relative_path
+
+
+app = Flask(
+    __name__,
+    template_folder=str(resource_path("templates")),
+    static_folder=str(resource_path("static")),
+)
 job_manager = DownloadJobManager()
 finder = default_finder()
 

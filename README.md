@@ -51,13 +51,35 @@ brew install yt-dlp aria2 ffmpeg
 
 ## Mac uygulamasi gibi kullanma
 
-Launcher uygulamasini olusturun:
+Native Mac uygulamasi icin desktop bagimliliklarini kurun:
+
+```bash
+.venv/bin/python -m pip install -r requirements-desktop.txt
+```
+
+Uygulamayi paketleyin:
+
+```bash
+packaging/macos/build_app.sh
+```
+
+Olusan native uygulama:
+
+```text
+dist/Sosyal Hali Saha Downloader.app
+```
+
+Bu uygulama tarayici yerine kendi Mac penceresinde acilir. Pencere kapaninca lokal server da kapanir.
+
+Desktop/iCloud altinda paketlerken macOS imza uyarisi gorebilirsiniz. Bu genelde file-provider metadata'sindan kaynaklanir; lokal kullanim icin paket yine olusur.
+
+Alternatif olarak hafif tarayici launcher uygulamasini olusturabilirsiniz:
 
 ```bash
 scripts/make_macos_app.sh
 ```
 
-Olusan uygulama:
+Olusan launcher:
 
 ```text
 Sosyal Hali Saha Downloader.app
@@ -81,7 +103,7 @@ Launcher loglari:
 .launcher/web.log
 ```
 
-Not: Bu `.app` sadece lokal launcher'dir. Projeyi public server olarak yayinlamaz.
+Not: Her iki `.app` de lokalde calisir. Projeyi public server olarak yayinlamaz.
 
 ## Web arayuzu
 
@@ -170,7 +192,7 @@ Ek secenekler:
 
 ```bash
 .venv/bin/python -m unittest discover -s tests
-.venv/bin/python -m py_compile app.py downloader.py extractor.py finder.py jobs.py utils.py main.py camera.py preflight.py history.py
+.venv/bin/python -m py_compile app.py downloader.py extractor.py finder.py jobs.py utils.py main.py camera.py preflight.py history.py desktop_app.py
 node --check static/app.js
 ```
 
